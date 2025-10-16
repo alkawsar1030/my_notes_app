@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'note_detail_page.dart';
 import '../widgets/add_note_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class NotesHomePage extends StatefulWidget {
   @override
@@ -11,6 +13,29 @@ class _NotesHomePageState extends State<NotesHomePage> {
   final List<String> notes = [];
   final PageController _pageController = PageController();
 
+  @override   ///নতুর যোগ করেছি
+  void initState() {
+    super.initState();
+    _loadNotes();
+  }
+
+  // SharedPreferences থেকে নোট লোড করা
+  Future<void> _loadNotes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedNotes = prefs.getStringList('notes') ?? [];
+    setState(() {
+      notes.clear();
+      notes.addAll(savedNotes);
+    });
+  }
+
+// SharedPreferences এ নোট সেভ করা
+  Future<void> _saveNotes() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setStringList('notes', notes);
+  }
+
+
   void _showAddNoteDialog() async {
     final newNote = await showDialog<String>(
       context: context,
@@ -19,6 +44,7 @@ class _NotesHomePageState extends State<NotesHomePage> {
 
     if (newNote != null && newNote.isNotEmpty) {
       setState(() => notes.add(newNote));
+      _saveNotes(); // 👈 নতুন লাইন
     }
   }
 
@@ -38,6 +64,7 @@ class _NotesHomePageState extends State<NotesHomePage> {
               setState(() {
                 notes.removeAt(index);
               });
+              _saveNotes(); // 👈 নতুন লাইন
               Navigator.pop(context);
             },
             child: const Text('Delete'),
@@ -114,6 +141,7 @@ class _NotesHomePageState extends State<NotesHomePage> {
               ),
               onDismissed: (direction) {
                 setState(() => notes.removeAt(index));
+                _saveNotes(); // 👈 নতুন লাইন
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(const SnackBar(content: Text('Note deleted')));
