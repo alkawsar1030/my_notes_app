@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'note_detail_page.dart';
 import '../widgets/add_note_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
+
+
 
 
 class NotesHomePage extends StatefulWidget {
@@ -18,7 +21,15 @@ class _NotesHomePageState extends State<NotesHomePage> {
     super.initState();
     _loadNotes();
   }
-
+  final List<Color> noteColors = [
+    Colors.teal.shade100,
+    Colors.amber.shade100,
+    Colors.pink.shade100,
+    Colors.lightBlue.shade100,
+    Colors.green.shade100,
+    Colors.deepPurple.shade100,
+    Colors.orange.shade100,
+  ];
   // SharedPreferences থেকে নোট লোড করা
   Future<void> _loadNotes() async {
     final prefs = await SharedPreferences.getInstance();
@@ -83,6 +94,7 @@ class _NotesHomePageState extends State<NotesHomePage> {
         children: [
           // 🟩 GridView Page
           GridView.builder(
+
             padding: const EdgeInsets.all(10),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -100,7 +112,9 @@ class _NotesHomePageState extends State<NotesHomePage> {
               ),
               child: Card(
                 elevation: 3,
-                color: Colors.teal.shade100,
+                color: noteColors[index % noteColors.length],//color adding
+
+
                 child: Stack(
                   children: [
                     Center(
@@ -148,7 +162,9 @@ class _NotesHomePageState extends State<NotesHomePage> {
               },
               child: ListTile(
                 leading: const Icon(Icons.note),
-                title: Text(notes[index]),
+                title: Text(' Item no $notes[index]'),
+
+
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
